@@ -1,0 +1,6 @@
+1. After finding what type of recovery is more popular we should compare our results to other data 
+2. Analyzing up to 30-50 videos per user. Out of 128 users so far
+3. we can do clustering of hashtags put on a 2d plane maybe? what do we need to make it where closer distance mean it 
+is more likely to show up on a post together.
+4. we should plot them number of hashtages per month in a year and see what months get the most attention, 
+hypothesis could be that after thanks giving more people are in need. 
