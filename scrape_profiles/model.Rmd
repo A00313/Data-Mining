@@ -1,0 +1,278 @@
+---
+title: "Homework 03"
+author: "Alabboodi, Ammar (email: ANA154@pitt.edu)"
+date: today
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+    theme: flatly
+---
+
+```{=html}
+<style>
+    table {
+      border-collapse: collapse;
+    }
+      table, th, td, thead, tbody{
+        border: 1px solid black;
+    }
+    thead {
+        border-bottom: solid black;
+    }
+</style>
+```
+
+# Overview
+
+##### This analysis explores TikTok posts that use the hashtag **#edrecovery**, which stands for *eating disorder recovery*. The goal is to understand common themes and communities emerging around this tag by examining co-occurring hashtags, performing text-based clustering, and visualizing groupings using dimensionality reduction.
+
+##### We obtained the data from a CSV file named `tiktok_hashtags.csv`, which contains usernames and associated hashtags used in TikTok posts. Each row represents a post and its corresponding hashtag string.
+
+The main steps in this analysis include:
+
+-   **Parsing and normalizing hashtags**, extracting all hashtags from each post and standardizing them (lowercasing and cleaning).
+
+-   **Identifying top co-occurring hashtags** with `#edrecovery` to highlight commonly discussed topics.
+
+-   **Constructing a Document-Term Matrix (DTM)** and applying **TF–IDF (Term Frequency - Inverse Document Frequency) weighting** to emphasize significant hashtags per post.
+
+-   **Clustering posts** using **K-means** based on their hashtag profiles to uncover distinct communities or thematic groups.
+
+-   **Visualizing clusters** using **Principal Component Analysis (PCA)** to reduce dimensionality and reveal separable clusters.
+
+-   **Profiling each cluster** by identifying the most representative hashtags for interpretation.
+
+##### This process helps us explore how TikTok users engage with the concept of recovery, the narratives they construct, and the subcultures that form within the broader #edrecovery discourse.
+
+```{r}
+# install.packages(c("tidyverse","tidytext","tm","ggplot2","factoextra"))
+library(tidyverse)
+library(tidytext)
+library(tm)
+library(ggplot2)
+library(factoextra)
+
+# Load & parse
+df <- read_csv("tiktok_hashtags.csv")
+
+df <- df %>%
+  mutate(
+    # extract all "#word" tokens
+    tags = str_extract_all(hashtags, "#\\w+"),
+    # normalize: lowercase + replace zero→o + unique
+    tags = map(tags, ~ unique(tolower(gsub("0", "o", .x)))),
+    # add a doc_id for later joins
+    doc_id = row_number()
+  )
+
+# Co‑occurrence with #edrecovery
+ed_df <- df %>% 
+  filter(map_lgl(tags, ~ "#edrecovery" %in% .x))
+
+co_occur <- ed_df %>%
+  unnest(tags) %>% 
+  filter(tags != "#edrecovery") %>%
+  count(tags, sort = TRUE) %>%
+  slice_head(n = 20)
+
+ggplot(co_occur, aes(x = reorder(tags, n), y = n, fill = n)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_gradient(low = "blue", high = "red") +
+  labs(
+    title = "Top 20 Hashtags Co‑occurring with #edrecovery",
+    x = "Hashtag", y = "Count"
+  ) +
+  theme_minimal()
+
+
+```
+
+## Co‑occurrence Analysis
+
+To better understand the thematic context of posts using **#edrecovery**, we first identified all hashtags that co-occur with it. After loading and parsing the dataset, we extracted hashtags from each post, normalized them by lowercasing and replacing zeros with the letter "o", and assigned a unique document ID to each entry.
+
+We then filtered the dataset to include only those posts containing `#edrecovery` and computed the frequency of all other hashtags that appear alongside it. The top 20 co-occurring hashtags were visualized using a horizontal bar chart with a gradient fill, emphasizing which tags most frequently accompany `#edrecovery`.
+
+This analysis gives us an initial glimpse into the most common themes and conversations that surround the recovery community on TikTok.
+
+```{r}
+# Build a DTM with TF‑IDF for all videos
+docs <- df %>%
+  transmute(
+    doc_id,
+    text = map_chr(tags, paste, collapse = " ")
+  )
+
+dtm <- docs %>%
+  unnest_tokens(term, text) %>%
+  count(doc_id, term, sort = FALSE) %>%
+  cast_dtm(doc_id, term, n)
+
+# apply TF‑IDF
+dtm_tfidf <- weightTfIdf(dtm)
+m <- as.matrix(dtm_tfidf)
+
+
+# Remove empty documents
+non_empty <- rowSums(m) > 0
+m_nz      <- m[non_empty, ]
+
+# L2‑normalize each row
+row_norms <- sqrt(rowSums(m_nz^2))
+m_nz      <- m_nz / row_norms
+
+# Choose k ≤ nrow(m_nz)−1
+k <- min(5, nrow(m_nz) - 1)
+set.seed(42)
+km <- kmeans(m_nz, centers = k, nstart = 25)
+
+# PCA on the already‐normalized matrix
+pca_res <- prcomp(m_nz, center = FALSE, scale. = FALSE)
+scores  <- data.frame(
+  PC1     = pca_res$x[,1],
+  PC2     = pca_res$x[,2],
+  cluster = factor(km$cluster)
+)
+
+# Plot
+library(ggplot2)
+ggplot(scores, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point(alpha = 0.7, size = 2) +
+  labs(
+    title = paste0("PCA of Videos Colored by K‑means Cluster (k=", k, ")"),
+    x = "PC1", y = "PC2", color = "Cluster"
+  ) +
+  theme_minimal()
+
+
+```
+
+## Clustering and Dimensionality Reduction
+
+To identify latent themes among all TikTok posts—not just those containing `#edrecovery`—we constructed a **Document-Term Matrix (DTM)** using the full set of normalized hashtags. We applied **TF–IDF weighting** to emphasize hashtags that are more informative within individual posts while down-weighting those that are too common across the dataset.
+
+After removing empty documents, we performed **L2 normalization** on the TF–IDF matrix to prepare it for clustering. We used **K-means clustering** (with `k` set dynamically to a maximum of 5, or fewer if the dataset was smaller) to group posts based on hashtag similarity.
+
+To visualize these clusters in two dimensions, we applied **Principal Component Analysis (PCA)** on the normalized matrix and plotted the first two principal components. The resulting scatter plot reveals distinct clusters, each representing a different thematic grouping of TikTok posts based on hashtag usage patterns.
+
+### Graph Reading
+
+That scatter is a map of videos in a two‑dimensional “hashtag space,” where:
+
+**PC1 (x‑axis)** captures the single biggest direction of variation in how videos use hashtags.
+
+**PC2 (y‑axis)** captures the next‑biggest, orthogonal direction of variation.
+
+**Clusters (colors):** Videos in the same color are those that the k‑means algorithm judged to have similar TF–IDF hashtag signatures.
+
+**Distance from each other:** Two videos plotted close together used almost the same mix of hashtags.
+
+**Distance from the origin:** Videos far out on PC1 or PC2 have “extreme” hashtag mixes in that direction. Videos near (0,0) use a more “average” combination.
+**Cluster separation:** Well‑separated blobs mean distinct hashtag communities. Overlap suggests videos that mix hashtags from multiple themes.
+
+```{r}
+loadings <- as.data.frame(pca_res$rotation[,1:2])
+# show top positive/negative hashtags on PC1
+head(arrange(loadings, desc(PC1)), 10)
+head(arrange(loadings, PC1), 10)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+# --- after you build `docs` and `dtm_tfidf` and do:
+m <- as.matrix(dtm_tfidf)
+
+# 1. Get the doc_ids that appear as rows in m
+valid_doc_ids <- as.integer(rownames(m))
+
+# 2. (Optional) further drop any all-zero rows, if you did L2-normalize
+non_zero_mask   <- rowSums(m) > 0
+valid_doc_ids   <- valid_doc_ids[non_zero_mask]
+m_nz            <- m[non_zero_mask, , drop = FALSE]
+
+# 3. Run k-means on the filtered matrix
+k <- min(5, nrow(m_nz) - 1)
+set.seed(42)
+km <- kmeans(m_nz, centers = k, nstart = 25)
+
+# 4. Build a map of doc_id → cluster
+cluster_map <- tibble(
+  doc_id  = valid_doc_ids,
+  cluster = factor(km$cluster)
+)
+
+# 5. Subset your original df by those doc_ids and join
+df_nz <- df %>%
+  filter(doc_id %in% valid_doc_ids) %>%
+  left_join(cluster_map, by = "doc_id")
+
+# 6. Now unnest and tally top tags per cluster
+top_tags_per_cluster <- df_nz %>%
+  unnest(tags) %>%
+  group_by(cluster, tags) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  arrange(cluster, desc(count)) %>%
+  group_by(cluster) %>%
+  slice_head(n = 5)
+
+print(top_tags_per_cluster)
+
+
+```
+
+# Cluster Interpretation of #edrecovery TikTok Hashtag Data
+
+------------------------------------------------------------------------
+
+## Cluster 1: **#vent — Emotional Expression & Personal Struggles**
+
+**Top hashtags:**\
+`#vent`, `#fyp`, `#ed`, `#21`, `#airportcrush`
+
+**Description:**\
+This cluster likely represents users sharing **personal stories**, emotional vulnerability, and possibly early-stage recovery narratives. Tags like `#vent` and `#ed` hint at **open emotional release**, while `#airportcrush` and `#21` add a sense of youth and personal anecdotes.
+
+------------------------------------------------------------------------
+
+## Cluster 2: **#real — Authenticity and Anti-Perfection**
+
+**Top hashtags:**\
+`#real`
+
+**Description:**\
+A minimal cluster dominated by `#real`. Suggests content focused on **authenticity**, **anti-glamour**, and **unfiltered mental health journeys**. Likely creators rejecting the curated nature of TikTok in favor of “what it’s really like.”
+
+------------------------------------------------------------------------
+
+## Cluster 3: **#london — Aesthetic & Cultural Identity**
+
+**Top hashtags:**\
+`#london`, `#clairo`, `#fionaapple`, `#kingsroad`, `#model`
+
+**Description:**\
+This cluster reflects a niche aesthetic — **urban, alternative, or indie-inspired recovery content**. The inclusion of artists like `#clairo` and `#fionaapple` plus location tags points to **cultural and aesthetic framing** of mental health and identity.
+
+------------------------------------------------------------------------
+
+## Cluster 4: **#fyp — Mainstream Recovery & Mental Health**
+
+**Top hashtags:**\
+`#fyp`, `#recovery`, `#mentalhealth`, `#edrecovery`, `#ed`
+
+**Description:**\
+The largest and most central cluster. Contains **general, highly visible** recovery content aimed at wide audiences. Likely to show up on TikTok’s **For You Page**. Themes include awareness, solidarity, and mainstream mental health narratives.
+
+------------------------------------------------------------------------
+
+## Cluster 5: **#collegelife — Student & Nostalgia Niche**
+
+**Top hashtags:**\
+`#onthisday`, `#collegelife`
+
+**Description:**\
+Small cluster possibly focused on **academic life** and **personal reflection**. May include recovery stories related to school stress or identity during college years, or throwback-style memory sharing.
