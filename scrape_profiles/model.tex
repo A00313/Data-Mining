@@ -1,0 +1,588 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Homework 03},
+  pdfauthor={Alabboodi, Ammar (email: ANA154@pitt.edu)},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Homework 03}
+\author{Alabboodi, Ammar (email:
+\href{mailto:ANA154@pitt.edu}{\nolinkurl{ANA154@pitt.edu}})}
+\date{today}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\section{Overview}\label{overview}
+
+\subparagraph{\texorpdfstring{This analysis explores TikTok posts that
+use the hashtag \textbf{\#edrecovery}, which stands for \emph{eating
+disorder recovery}. The goal is to understand common themes and
+communities emerging around this tag by examining co-occurring hashtags,
+performing text-based clustering, and visualizing groupings using
+dimensionality
+reduction.}{This analysis explores TikTok posts that use the hashtag \#edrecovery, which stands for eating disorder recovery. The goal is to understand common themes and communities emerging around this tag by examining co-occurring hashtags, performing text-based clustering, and visualizing groupings using dimensionality reduction.}}\label{this-analysis-explores-tiktok-posts-that-use-the-hashtag-edrecovery-which-stands-for-eating-disorder-recovery.-the-goal-is-to-understand-common-themes-and-communities-emerging-around-this-tag-by-examining-co-occurring-hashtags-performing-text-based-clustering-and-visualizing-groupings-using-dimensionality-reduction.}
+
+\subparagraph{\texorpdfstring{We obtained the data from a CSV file named
+\texttt{tiktok\_hashtags.csv}, which contains usernames and associated
+hashtags used in TikTok posts. Each row represents a post and its
+corresponding hashtag
+string.}{We obtained the data from a CSV file named tiktok\_hashtags.csv, which contains usernames and associated hashtags used in TikTok posts. Each row represents a post and its corresponding hashtag string.}}\label{we-obtained-the-data-from-a-csv-file-named-tiktok_hashtags.csv-which-contains-usernames-and-associated-hashtags-used-in-tiktok-posts.-each-row-represents-a-post-and-its-corresponding-hashtag-string.}
+
+The main steps in this analysis include:
+
+\begin{itemize}
+\item
+  \textbf{Parsing and normalizing hashtags}, extracting all hashtags
+  from each post and standardizing them (lowercasing and cleaning).
+\item
+  \textbf{Identifying top co-occurring hashtags} with
+  \texttt{\#edrecovery} to highlight commonly discussed topics.
+\item
+  \textbf{Constructing a Document-Term Matrix (DTM)} and applying
+  \textbf{TF--IDF (Term Frequency - Inverse Document Frequency)
+  weighting} to emphasize significant hashtags per post.
+\item
+  \textbf{Clustering posts} using \textbf{K-means} based on their
+  hashtag profiles to uncover distinct communities or thematic groups.
+\item
+  \textbf{Visualizing clusters} using \textbf{Principal Component
+  Analysis (PCA)} to reduce dimensionality and reveal separable
+  clusters.
+\item
+  \textbf{Profiling each cluster} by identifying the most representative
+  hashtags for interpretation.
+\end{itemize}
+
+\subparagraph{This process helps us explore how TikTok users engage with
+the concept of recovery, the narratives they construct, and the
+subcultures that form within the broader \#edrecovery
+discourse.}\label{this-process-helps-us-explore-how-tiktok-users-engage-with-the-concept-of-recovery-the-narratives-they-construct-and-the-subcultures-that-form-within-the-broader-edrecovery-discourse.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# install.packages(c("tidyverse","tidytext","tm","ggplot2","factoextra"))}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.1.4     v readr     2.1.5
+## v forcats   1.0.0     v stringr   1.5.1
+## v ggplot2   3.5.2     v tibble    3.2.1
+## v lubridate 1.9.4     v tidyr     1.3.1
+## v purrr     1.0.2     
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidytext)}
+\FunctionTok{library}\NormalTok{(tm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: NLP
+## 
+## Attaching package: 'NLP'
+## 
+## The following object is masked from 'package:ggplot2':
+## 
+##     annotate
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(factoextra)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load \& parse}
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"tiktok\_hashtags.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 3101 Columns: 4
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr (2): username, hashtags
+## dbl (1): video_id
+## lgl (1): video_url
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \CommentTok{\# extract all "\#word" tokens}
+    \AttributeTok{tags =} \FunctionTok{str\_extract\_all}\NormalTok{(hashtags, }\StringTok{"\#}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{w+"}\NormalTok{),}
+    \CommentTok{\# normalize: lowercase + replace zero→o + unique}
+    \AttributeTok{tags =} \FunctionTok{map}\NormalTok{(tags, }\SpecialCharTok{\textasciitilde{}} \FunctionTok{unique}\NormalTok{(}\FunctionTok{tolower}\NormalTok{(}\FunctionTok{gsub}\NormalTok{(}\StringTok{"0"}\NormalTok{, }\StringTok{"o"}\NormalTok{, .x)))),}
+    \CommentTok{\# add a doc\_id for later joins}
+    \AttributeTok{doc\_id =} \FunctionTok{row\_number}\NormalTok{()}
+\NormalTok{  )}
+
+\CommentTok{\# Co‑occurrence with \#edrecovery}
+\NormalTok{ed\_df }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}\FunctionTok{map\_lgl}\NormalTok{(tags, }\SpecialCharTok{\textasciitilde{}} \StringTok{"\#edrecovery"} \SpecialCharTok{\%in\%}\NormalTok{ .x))}
+
+\NormalTok{co\_occur }\OtherTok{\textless{}{-}}\NormalTok{ ed\_df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{unnest}\NormalTok{(tags) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(tags }\SpecialCharTok{!=} \StringTok{"\#edrecovery"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{(tags, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{20}\NormalTok{)}
+
+\FunctionTok{ggplot}\NormalTok{(co\_occur, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(tags, n), }\AttributeTok{y =}\NormalTok{ n, }\AttributeTok{fill =}\NormalTok{ n)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_gradient}\NormalTok{(}\AttributeTok{low =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{high =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Top 20 Hashtags Co‑occurring with \#edrecovery"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Hashtag"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Count"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{model_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\subsection{Co‑occurrence Analysis}\label{cooccurrence-analysis}
+
+To better understand the thematic context of posts using
+\textbf{\#edrecovery}, we first identified all hashtags that co-occur
+with it. After loading and parsing the dataset, we extracted hashtags
+from each post, normalized them by lowercasing and replacing zeros with
+the letter ``o'', and assigned a unique document ID to each entry.
+
+We then filtered the dataset to include only those posts containing
+\texttt{\#edrecovery} and computed the frequency of all other hashtags
+that appear alongside it. The top 20 co-occurring hashtags were
+visualized using a horizontal bar chart with a gradient fill,
+emphasizing which tags most frequently accompany \texttt{\#edrecovery}.
+
+This analysis gives us an initial glimpse into the most common themes
+and conversations that surround the recovery community on TikTok.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Build a DTM with TF‑IDF for all videos}
+\NormalTok{docs }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{transmute}\NormalTok{(}
+\NormalTok{    doc\_id,}
+    \AttributeTok{text =} \FunctionTok{map\_chr}\NormalTok{(tags, paste, }\AttributeTok{collapse =} \StringTok{" "}\NormalTok{)}
+\NormalTok{  )}
+
+\NormalTok{dtm }\OtherTok{\textless{}{-}}\NormalTok{ docs }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{unnest\_tokens}\NormalTok{(term, text) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{(doc\_id, term, }\AttributeTok{sort =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{cast\_dtm}\NormalTok{(doc\_id, term, n)}
+
+\CommentTok{\# apply TF‑IDF}
+\NormalTok{dtm\_tfidf }\OtherTok{\textless{}{-}} \FunctionTok{weightTfIdf}\NormalTok{(dtm)}
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{as.matrix}\NormalTok{(dtm\_tfidf)}
+
+
+\CommentTok{\# Remove empty documents}
+\NormalTok{non\_empty }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(m) }\SpecialCharTok{\textgreater{}} \DecValTok{0}
+\NormalTok{m\_nz      }\OtherTok{\textless{}{-}}\NormalTok{ m[non\_empty, ]}
+
+\CommentTok{\# L2‑normalize each row}
+\NormalTok{row\_norms }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{rowSums}\NormalTok{(m\_nz}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\NormalTok{m\_nz      }\OtherTok{\textless{}{-}}\NormalTok{ m\_nz }\SpecialCharTok{/}\NormalTok{ row\_norms}
+
+\CommentTok{\# Choose k ≤ nrow(m\_nz)−1}
+\NormalTok{k }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(}\DecValTok{5}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(m\_nz) }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{km }\OtherTok{\textless{}{-}} \FunctionTok{kmeans}\NormalTok{(m\_nz, }\AttributeTok{centers =}\NormalTok{ k, }\AttributeTok{nstart =} \DecValTok{25}\NormalTok{)}
+
+\CommentTok{\# PCA on the already‐normalized matrix}
+\NormalTok{pca\_res }\OtherTok{\textless{}{-}} \FunctionTok{prcomp}\NormalTok{(m\_nz, }\AttributeTok{center =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{scale. =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{scores  }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{PC1     =}\NormalTok{ pca\_res}\SpecialCharTok{$}\NormalTok{x[,}\DecValTok{1}\NormalTok{],}
+  \AttributeTok{PC2     =}\NormalTok{ pca\_res}\SpecialCharTok{$}\NormalTok{x[,}\DecValTok{2}\NormalTok{],}
+  \AttributeTok{cluster =} \FunctionTok{factor}\NormalTok{(km}\SpecialCharTok{$}\NormalTok{cluster)}
+\NormalTok{)}
+
+\CommentTok{\# Plot}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{ggplot}\NormalTok{(scores, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ PC1, }\AttributeTok{y =}\NormalTok{ PC2, }\AttributeTok{color =}\NormalTok{ cluster)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{, }\AttributeTok{size =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PCA of Videos Colored by K‑means Cluster (k="}\NormalTok{, k, }\StringTok{")"}\NormalTok{),}
+    \AttributeTok{x =} \StringTok{"PC1"}\NormalTok{, }\AttributeTok{y =} \StringTok{"PC2"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Cluster"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{model_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\subsection{Clustering and Dimensionality
+Reduction}\label{clustering-and-dimensionality-reduction}
+
+To identify latent themes among all TikTok posts---not just those
+containing \texttt{\#edrecovery}---we constructed a
+\textbf{Document-Term Matrix (DTM)} using the full set of normalized
+hashtags. We applied \textbf{TF--IDF weighting} to emphasize hashtags
+that are more informative within individual posts while down-weighting
+those that are too common across the dataset.
+
+After removing empty documents, we performed \textbf{L2 normalization}
+on the TF--IDF matrix to prepare it for clustering. We used
+\textbf{K-means clustering} (with \texttt{k} set dynamically to a
+maximum of 5, or fewer if the dataset was smaller) to group posts based
+on hashtag similarity.
+
+To visualize these clusters in two dimensions, we applied
+\textbf{Principal Component Analysis (PCA)} on the normalized matrix and
+plotted the first two principal components. The resulting scatter plot
+reveals distinct clusters, each representing a different thematic
+grouping of TikTok posts based on hashtag usage patterns.
+
+\subsubsection{Graph Reading}\label{graph-reading}
+
+That scatter is a map of videos in a two‑dimensional ``hashtag space,''
+where:
+
+\textbf{PC1 (x‑axis)} captures the single biggest direction of variation
+in how videos use hashtags.
+
+\textbf{PC2 (y‑axis)} captures the next‑biggest, orthogonal direction of
+variation.
+
+\textbf{Clusters (colors):} Videos in the same color are those that the
+k‑means algorithm judged to have similar TF--IDF hashtag signatures.
+
+\textbf{Distance from each other:} Two videos plotted close together
+used almost the same mix of hashtags.
+
+\textbf{Distance from the origin:} Videos far out on PC1 or PC2 have
+``extreme'' hashtag mixes in that direction. Videos near (0,0) use a
+more ``average'' combination. \textbf{Cluster separation:}
+Well‑separated blobs mean distinct hashtag communities. Overlap suggests
+videos that mix hashtags from multiple themes.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{loadings }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(pca\_res}\SpecialCharTok{$}\NormalTok{rotation[,}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{\# show top positive/negative hashtags on PC1}
+\FunctionTok{head}\NormalTok{(}\FunctionTok{arrange}\NormalTok{(loadings, }\FunctionTok{desc}\NormalTok{(PC1)), }\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                      PC1 PC2
+## canonevent             0   0
+## innerchild             0   0
+## positivemindset        0   0
+## grateful               0   0
+## charlesleclerc         0   0
+## livelovelaugh          0   0
+## controversialopinion   0   0
+## outsideclothes         0   0
+## calendar               0   0
+## months                 0   0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(}\FunctionTok{arrange}\NormalTok{(loadings, PC1), }\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                           PC1         PC2
+## edsheeranrecoveryy -0.2949208  0.13256057
+## mentalhealth       -0.2909503 -0.03538639
+## neda               -0.2742561  0.13197440
+## anarecovery        -0.2724240  0.10145193
+## foodfreedom        -0.2550684  0.11973645
+## edrecovery         -0.2235223 -0.29566749
+## fearfood           -0.2171127  0.11493648
+## recovery           -0.2004076  0.05097418
+## fyp                -0.1974554  0.05704970
+## ed                 -0.1920510  0.07676979
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(tidyr)}
+
+\CommentTok{\# {-}{-}{-} after you build \textasciigrave{}docs\textasciigrave{} and \textasciigrave{}dtm\_tfidf\textasciigrave{} and do:}
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{as.matrix}\NormalTok{(dtm\_tfidf)}
+
+\CommentTok{\# 1. Get the doc\_ids that appear as rows in m}
+\NormalTok{valid\_doc\_ids }\OtherTok{\textless{}{-}} \FunctionTok{as.integer}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(m))}
+
+\CommentTok{\# 2. (Optional) further drop any all{-}zero rows, if you did L2{-}normalize}
+\NormalTok{non\_zero\_mask   }\OtherTok{\textless{}{-}} \FunctionTok{rowSums}\NormalTok{(m) }\SpecialCharTok{\textgreater{}} \DecValTok{0}
+\NormalTok{valid\_doc\_ids   }\OtherTok{\textless{}{-}}\NormalTok{ valid\_doc\_ids[non\_zero\_mask]}
+\NormalTok{m\_nz            }\OtherTok{\textless{}{-}}\NormalTok{ m[non\_zero\_mask, , drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+
+\CommentTok{\# 3. Run k{-}means on the filtered matrix}
+\NormalTok{k }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(}\DecValTok{5}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(m\_nz) }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{km }\OtherTok{\textless{}{-}} \FunctionTok{kmeans}\NormalTok{(m\_nz, }\AttributeTok{centers =}\NormalTok{ k, }\AttributeTok{nstart =} \DecValTok{25}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Quick-TRANSfer stage steps exceeded maximum (= 107500)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 4. Build a map of doc\_id → cluster}
+\NormalTok{cluster\_map }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+  \AttributeTok{doc\_id  =}\NormalTok{ valid\_doc\_ids,}
+  \AttributeTok{cluster =} \FunctionTok{factor}\NormalTok{(km}\SpecialCharTok{$}\NormalTok{cluster)}
+\NormalTok{)}
+
+\CommentTok{\# 5. Subset your original df by those doc\_ids and join}
+\NormalTok{df\_nz }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(doc\_id }\SpecialCharTok{\%in\%}\NormalTok{ valid\_doc\_ids) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(cluster\_map, }\AttributeTok{by =} \StringTok{"doc\_id"}\NormalTok{)}
+
+\CommentTok{\# 6. Now unnest and tally top tags per cluster}
+\NormalTok{top\_tags\_per\_cluster }\OtherTok{\textless{}{-}}\NormalTok{ df\_nz }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{unnest}\NormalTok{(tags) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(cluster, tags) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(cluster, }\FunctionTok{desc}\NormalTok{(count)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(cluster) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{5}\NormalTok{)}
+
+\FunctionTok{print}\NormalTok{(top\_tags\_per\_cluster)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 18 x 3
+## # Groups:   cluster [5]
+##    cluster tags          count
+##    <fct>   <chr>         <int>
+##  1 1       #vent            13
+##  2 1       #fyp              7
+##  3 1       #ed               2
+##  4 1       #21               1
+##  5 1       #airportcrush     1
+##  6 2       #real            28
+##  7 3       #london           6
+##  8 3       #clairo           1
+##  9 3       #fionaapple       1
+## 10 3       #kingsroad        1
+## 11 3       #model            1
+## 12 4       #fyp            751
+## 13 4       #recovery       465
+## 14 4       #mentalhealth   457
+## 15 4       #edrecovery     380
+## 16 4       #ed             305
+## 17 5       #onthisday        3
+## 18 5       #collegelife      2
+\end{verbatim}
+
+\section{Cluster Interpretation of \#edrecovery TikTok Hashtag
+Data}\label{cluster-interpretation-of-edrecovery-tiktok-hashtag-data}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{\texorpdfstring{Cluster 1: \textbf{\#vent --- Emotional
+Expression \& Personal
+Struggles}}{Cluster 1: \#vent --- Emotional Expression \& Personal Struggles}}\label{cluster-1-vent-emotional-expression-personal-struggles}
+
+\textbf{Top hashtags:}\\
+\texttt{\#vent}, \texttt{\#fyp}, \texttt{\#ed}, \texttt{\#21},
+\texttt{\#airportcrush}
+
+\textbf{Description:}\\
+This cluster likely represents users sharing \textbf{personal stories},
+emotional vulnerability, and possibly early-stage recovery narratives.
+Tags like \texttt{\#vent} and \texttt{\#ed} hint at \textbf{open
+emotional release}, while \texttt{\#airportcrush} and \texttt{\#21} add
+a sense of youth and personal anecdotes.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{\texorpdfstring{Cluster 2: \textbf{\#real --- Authenticity
+and
+Anti-Perfection}}{Cluster 2: \#real --- Authenticity and Anti-Perfection}}\label{cluster-2-real-authenticity-and-anti-perfection}
+
+\textbf{Top hashtags:}\\
+\texttt{\#real}
+
+\textbf{Description:}\\
+A minimal cluster dominated by \texttt{\#real}. Suggests content focused
+on \textbf{authenticity}, \textbf{anti-glamour}, and \textbf{unfiltered
+mental health journeys}. Likely creators rejecting the curated nature of
+TikTok in favor of ``what it's really like.''
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{\texorpdfstring{Cluster 3: \textbf{\#london --- Aesthetic \&
+Cultural
+Identity}}{Cluster 3: \#london --- Aesthetic \& Cultural Identity}}\label{cluster-3-london-aesthetic-cultural-identity}
+
+\textbf{Top hashtags:}\\
+\texttt{\#london}, \texttt{\#clairo}, \texttt{\#fionaapple},
+\texttt{\#kingsroad}, \texttt{\#model}
+
+\textbf{Description:}\\
+This cluster reflects a niche aesthetic --- \textbf{urban, alternative,
+or indie-inspired recovery content}. The inclusion of artists like
+\texttt{\#clairo} and \texttt{\#fionaapple} plus location tags points to
+\textbf{cultural and aesthetic framing} of mental health and identity.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{\texorpdfstring{Cluster 4: \textbf{\#fyp --- Mainstream
+Recovery \& Mental
+Health}}{Cluster 4: \#fyp --- Mainstream Recovery \& Mental Health}}\label{cluster-4-fyp-mainstream-recovery-mental-health}
+
+\textbf{Top hashtags:}\\
+\texttt{\#fyp}, \texttt{\#recovery}, \texttt{\#mentalhealth},
+\texttt{\#edrecovery}, \texttt{\#ed}
+
+\textbf{Description:}\\
+The largest and most central cluster. Contains \textbf{general, highly
+visible} recovery content aimed at wide audiences. Likely to show up on
+TikTok's \textbf{For You Page}. Themes include awareness, solidarity,
+and mainstream mental health narratives.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{\texorpdfstring{Cluster 5: \textbf{\#collegelife --- Student
+\& Nostalgia
+Niche}}{Cluster 5: \#collegelife --- Student \& Nostalgia Niche}}\label{cluster-5-collegelife-student-nostalgia-niche}
+
+\textbf{Top hashtags:}\\
+\texttt{\#onthisday}, \texttt{\#collegelife}
+
+\textbf{Description:}\\
+Small cluster possibly focused on \textbf{academic life} and
+\textbf{personal reflection}. May include recovery stories related to
+school stress or identity during college years, or throwback-style
+memory sharing.
+
+\end{document}
