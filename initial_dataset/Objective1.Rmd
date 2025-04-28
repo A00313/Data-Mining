@@ -1,0 +1,184 @@
+---
+title: "Objective1"
+author: "Havannah Tung and Amar Alabbodi"
+date: "2025-04-17"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Install packages
+```{r}
+library(tidyverse)
+library(naniar)
+library(factoextra)
+library(tidytext)
+library(tm)
+library(fastDummies)
+```
+
+Import dataset and view features in raw dataset
+```{r}
+search.result_raw <- read.csv("search_result_edrec0very.csv")
+```
+*Data cleaning: *
+```{r}
+search.result <- search.result_raw |> 
+  # deleting unuseful columns related to music, video format, effect, url, and id
+  dplyr::select(-contains(c('Mentions', 'music', 'Url', '.id', 
+                            'cover', 'title', 'effectStickers', 
+                            'videoMeta', 'Query', 'Time', 'text'))) |>
+  # deleting other columns that are not useful for analysis
+  dplyr::select(-c(authorMeta.avatar, 
+                   authorMeta.nickName,
+                   authorMeta.signature,
+                   authorMeta.bioLink,
+                   authorMeta.name,
+                   id, 
+                   isMuted
+                   )) |>
+  # replace all missing values to NA
+  replace_with_na_all(condition = ~.x == "") 
+
+# Turn binary features into factors
+search.result <- search.result |> 
+  mutate(authorMeta.privateAccount = as.factor(authorMeta.privateAccount), 
+         authorMeta.verified = as.factor(authorMeta.verified), 
+         isAd = as.factor(isAd), 
+         isPinned = as.factor(isPinned), 
+         isSlideshow = as.factor(isSlideshow))
+
+# Check distribution of the binary features 
+search.result |> dplyr::select(authorMeta.privateAccount, 
+                        authorMeta.verified, 
+                        isAd, 
+                        isPinned, 
+                        isSlideshow) |> summary()
+```
+
+```{r}
+# Delete binary variables that are 100% false
+search.result <- search.result |> 
+  dplyr::select(-c(authorMeta.privateAccount, authorMeta.verified, isAd, isPinned,
+            isSlideshow)) 
+
+# Remove videos with no hashtags 
+search.result <- search.result |> filter(hashtags.0.name != 'NA')
+
+search.result 
+```
+
+Popularity analyses: 
+
+```{r}
+popularity <- search.result |> dplyr::select(is.integer) |> scale() |> as.data.frame()
+
+popularity |> pivot_longer(cols = everything()) |> 
+  ggplot(aes(x= value)) + 
+  geom_histogram() +
+  facet_wrap("name", scales = "free") +
+  theme_minimal()
+
+```
+Normalizing skewed data
+```{r}
+popularity |> pivot_longer(cols = everything()) |> 
+  ggplot(aes(x= log10(value+1))) + 
+  geom_histogram() + 
+  facet_wrap("name", scales = "free") +
+  labs(x = "log10-transformed value") +
+  theme_minimal()
+```
+
+
+Analysis on hashtags
+```{r}
+hashtags <- search.result |> mutate(vid.id = row_number()) |> 
+  pivot_longer(cols = starts_with('hashtags.'), 
+               names_to = 'hashtag.no', 
+               names_prefix = 'hashtags.', 
+               values_to = 'hashtag', 
+               values_drop_na = TRUE) |> 
+  dplyr::select(c(vid.id, hashtag.no, hashtag)) 
+
+# check distribution of co-occuring hashtags with #edrec0very
+co.hashtags <- hashtags |> 
+  mutate(hashtag = as.factor(hashtag)) 
+
+# show top 20 co-occuring hashtags
+co.hashtags$hashtag |> summary() |> head(20) |> 
+  barplot(horiz = FALSE, cex.names = 0.5, las = 2, main = "Top 20 hashtags used in #edrec0very search results")
+```
+Creating binary dummy dataframe for all videos
+```{r}
+co.hash.bin <- co.hashtags |> 
+  dplyr::select(c(vid.id, hashtag)) |> 
+  dummy_cols(select_columns = 'hashtag') |> 
+  dplyr::select(-hashtag) |> group_by(vid.id) |> 
+  summarize(across(everything(), sum), .groups = 'drop') |> 
+  dplyr::select(-vid.id)
+
+set.seed(777)
+pca.hash <- prcomp(co.hash.bin)
+hash.pc <- predict(pca.hash)
+hash.dist <- dist(hash.pc[,1:2]) 
+hash.mds <- cmdscale(hash.dist)
+
+
+# cluster visualization
+hash.km <- eclust(hash.mds[,1:2], 
+                  FUNcluster = 'kmeans',
+                  k = 4, 
+                  graph = FALSE)
+
+
+hash.km |> fviz_cluster(main = ' ',
+                               xlab = FALSE, ylab = FALSE, 
+                       geom = 'point', show.clust.cent = FALSE)
+```
+```{r}
+search.result <- search.result |> 
+  mutate(cluster = as.factor(hash.km$cluster))
+
+popularity <- popularity |> mutate(cluster = as.factor(hash.km$cluster))
+```
+
+Based on hashtags 
+```{r}
+search.result |> filter(cluster == 1) |> dplyr::select(starts_with('hashtags.')) |> unlist() |> as.factor() |> summary() |> sort(decreasing = TRUE)|> head(20)
+```
+
+```{r}
+search.result |> filter(cluster == 2) |> dplyr::select(starts_with('hashtags.')) |> unlist() |> as.factor() |> summary() |> sort(decreasing = TRUE)|> head(20)
+```
+
+```{r}
+search.result |> filter(cluster == 3) |> dplyr::select(starts_with('hashtags.')) |> unlist() |> as.factor() |> summary() |> sort(decreasing = TRUE)|> head(20)
+```
+
+```{r}
+search.result |> filter(cluster == 4) |> dplyr::select(starts_with('hashtags.')) |> unlist() |> as.factor() |> summary() |> sort(decreasing = TRUE)|> head(20)
+```
+stats based on cluster
+```{r}
+popularity |> 
+  group_by(cluster) |>
+  pivot_longer(cols = contains('authorMeta')) |> 
+  ggplot(aes(x= value, color = cluster)) + 
+  geom_boxplot(outliers = FALSE) +
+  facet_wrap("name", scales = 'free_x') +
+  theme_minimal()
+```
+
+
+```{r}
+popularity |> 
+  group_by(cluster) |>
+  pivot_longer(cols = contains('Count')) |> 
+  ggplot(aes(x= value, color = cluster)) + 
+  geom_boxplot(outliers = FALSE) +
+  facet_wrap("name", scales = 'free_x') +
+  theme_minimal()
+```
