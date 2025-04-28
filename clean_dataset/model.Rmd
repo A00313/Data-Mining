@@ -339,6 +339,36 @@ Cluster 3, centered around #exerciseaddictionrecovery, has a high purity of 77.7
 
 Cluster 4, with the top hashtag #fitcheck, shows a high purity of 76.92% and a low entropy of 0.99. This indicates that the majority of posts in this cluster are centered around the theme of fashion and self-expression, particularly through outfit sharing (#fitcheck). The content here is highly focused on personal style and self-image, and likely intersects with recovery themes, showing a consistent focus on fashion as a form of self-empowerment.
 
+```{r}
+# Load libraries
+# Load libraries
+library(ggplot2)
+
+# Create a longer-format dataframe
+eval_long <- data.frame(
+  Cluster = factor(rep(c(2, 5, 3, 1, 4), each = 2)),
+  Metric = rep(c("Purity", "Entropy"), times = 5),
+  Value = c(1.00, 0.00,   # Cluster 2
+            0.60, 0.97,   # Cluster 5
+            0.46, 2.51,   # Cluster 3
+            0.18, 5.17,   # Cluster 1
+            0.05, 8.59)   # Cluster 4
+)
+
+# Grouped bar plot
+ggplot(eval_long, aes(x = Cluster, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7, color = "black") +
+  labs(title = "Cluster Evaluation: Purity and Entropy",
+       x = "Cluster",
+       y = "Value") +
+  scale_fill_manual(values = c("Purity" = "#4CAF50", "Entropy" = "#F44336")) + # green for purity, red for entropy
+  theme_minimal() +
+  theme(legend.position = "top") +
+  ylim(0, 9)  # Extend y-axis for entropy values
+
+
+```
+
 ### Summary:
 
 -   **Cluster 1** has a moderate focus on college life and related mental health experiences, though there is some diversity in the content.
