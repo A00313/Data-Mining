@@ -6,6 +6,12 @@ Ammar Alabboodi (ana154@pitt.edu)
 
 Havannah Tung (hat127@pitt.edu)
 
+This repository contains all materials for our project, including the final presentation slides, final paper, code, and dataset(s).
+
+
+[Final Project Slides (PDF)](Data-Mining/DM%20Spring%2025%20Group%203.pdf)
+
+
 ## 📖 Abstract
 
 Since TikTok's rise in popularity among young users in early 2020, concerns have grown regarding the platform's lack of regulation against content promoting unrealistic beauty standards. TikTok responded by updating ad policies (September 2020) and introducing interventions for eating disorder (ED) related searches (February 2021), such as redirecting users to the National Alliance for Eating Disorders Helpline. However, misspelled hashtags like #edrec0very (using "0" instead of "o") emerged as workarounds.
