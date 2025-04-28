@@ -15,7 +15,7 @@ This repository contains all materials for our project, including the final pres
 
 [Source Code](https://github.com/A00313/Data-Mining)
 
-[Search Dataset](search_result_edrec0very.csv)
+[Search Dataset](initial_dataset/search_result_edrec0very.csv)
 
 [Profile Dataset](scrape_profiles/tiktok_hashtags.csv)
 
