@@ -172,8 +172,7 @@ That scatter is a map of videos in a two‑dimensional “hashtag space,” wher
 
 **Distance from each other:** Two videos plotted close together used almost the same mix of hashtags.
 
-**Distance from the origin:** Videos far out on PC1 or PC2 have “extreme” hashtag mixes in that direction. Videos near (0,0) use a more “average” combination.
-**Cluster separation:** Well‑separated blobs mean distinct hashtag communities. Overlap suggests videos that mix hashtags from multiple themes.
+**Distance from the origin:** Videos far out on PC1 or PC2 have “extreme” hashtag mixes in that direction. Videos near (0,0) use a more “average” combination. **Cluster separation:** Well‑separated blobs mean distinct hashtag communities. Overlap suggests videos that mix hashtags from multiple themes.
 
 ```{r}
 loadings <- as.data.frame(pca_res$rotation[,1:2])
@@ -278,3 +277,41 @@ The largest and most central cluster. Contains **general, highly visible** recov
 
 **Description:**\
 Small cluster possibly focused on **academic life** and **personal reflection**. May include recovery stories related to school stress or identity during college years, or throwback-style memory sharing.
+
+```{r}
+# Compute Purity and Entropy per cluster
+library(dplyr)
+
+# Helper function for entropy
+entropy <- function(p) {
+  p <- p[p > 0]
+  -sum(p * log2(p))
+}
+
+# Purity and entropy calculation
+cluster_eval <- df_nz %>%
+  unnest(tags) %>%
+  group_by(cluster, tags) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(cluster) %>%
+  mutate(total = sum(count),
+         prop = count / total) %>%
+  summarise(
+    top_tag = first(tags),
+    top_tag_prop = max(prop),
+    cluster_entropy = entropy(prop)
+  )
+
+cluster_eval
+
+```
+
+Cluster 2 shows perfect purity (**100%**) and zero entropy, meaning that **every single post** in that cluster prominently featured the hashtag **#real**. This indicates that K-means clustering captured a very tight and coherent group of posts all centered around authenticity and unfiltered mental health narratives, as expected.
+
+Cluster 5, centered around **#collegelife**, also shows a high purity of **60%** and a low entropy of **0.97**, suggesting that the majority of posts within this group relate to the college life experience and reflections tied to mental health and eating disorder recovery. This cluster is relatively homogeneous, meaning users in this group consistently reference the same theme.
+
+Cluster 3, with the top tag **#clairo** (an indie artist), has a moderate purity of **46%** and an entropy of **2.51**. This shows that although #clairo is the most common tag, there is still **moderate diversity** in hashtags within this group. Likely, posts here blend aesthetic or musical references with recovery narratives, but also touch on broader topics.
+
+Cluster 1, with the top tag **#21**, has relatively **low purity (18%)** and a **high entropy (5.17)**. This indicates that the cluster is **heterogeneous** — there is no strong single theme dominating. Posts here might be more personal and varied, sharing a wide range of recovery experiences, life events, or even random content alongside recovery hashtags.
+
+Cluster 4 stands out: although **#1** is the top tag, it represents only **5%** of the posts, and the entropy is extremely high (**8.59**). This suggests that Cluster 4 is **very mixed and noisy** — it does not represent a clean, single-topic group. It might include miscellaneous or hard-to-classify posts where hashtags are highly varied, and no strong common theme exists.
