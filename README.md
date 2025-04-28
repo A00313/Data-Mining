@@ -9,7 +9,7 @@ Havannah Tung (hat127@pitt.edu)
 This repository contains all materials for our project, including the final presentation slides, final paper, code, and dataset(s).
 
 
-[Final Project Slides (PDF)](Data-Mining/DM%20Spring%2025%20Group%203.pdf)
+[Final Project Slides (PDF)](DM%20Spring%2025%20Group%203.pdf)
 
 
 ## 📖 Abstract
