@@ -11,7 +11,7 @@ This repository contains all materials for our project, including the final pres
 ## Contents
 [Final Project Slides (PDF)](DM%20Spring%2025%20Group%203.pdf)
 
-[Final Project Paper (PDF)](DM%Spring25%final%paper.docx.pdf)
+[Final Project Paper (PDF)](DM%20Spring25%20final%20paper.docx.pdf)
 
 [Source Code](https://github.com/A00313/Data-Mining)
 
