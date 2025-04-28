@@ -101,50 +101,53 @@ We then filtered the dataset to include only those posts containing `#edrecovery
 This analysis gives us an initial glimpse into the most common themes and conversations that surround the recovery community on TikTok.
 
 ```{r}
-# Build a DTM with TF‑IDF for all videos
+# Build a DTM with TF-IDF for all videos
 docs <- df %>%
   transmute(
     doc_id,
     text = map_chr(tags, paste, collapse = " ")
   )
 
+# Remove any rows with N/A or missing terms
+docs <- docs %>% filter(!is.na(text) & text != "")
+
+# Create the DTM
 dtm <- docs %>%
   unnest_tokens(term, text) %>%
   count(doc_id, term, sort = FALSE) %>%
   cast_dtm(doc_id, term, n)
 
-# apply TF‑IDF
+# Apply TF-IDF weighting
 dtm_tfidf <- weightTfIdf(dtm)
 m <- as.matrix(dtm_tfidf)
 
-
-# Remove empty documents
+# Remove empty documents (rows with no terms)
 non_empty <- rowSums(m) > 0
-m_nz      <- m[non_empty, ]
+m_nz <- m[non_empty, ]
 
-# L2‑normalize each row
+# L2-normalize each row (document)
 row_norms <- sqrt(rowSums(m_nz^2))
-m_nz      <- m_nz / row_norms
+m_nz <- m_nz / row_norms
 
-# Choose k ≤ nrow(m_nz)−1
+# Choose k (number of clusters) ≤ nrow(m_nz)−1
 k <- min(5, nrow(m_nz) - 1)
 set.seed(42)
 km <- kmeans(m_nz, centers = k, nstart = 25)
 
-# PCA on the already‐normalized matrix
+# Perform PCA on the normalized matrix
 pca_res <- prcomp(m_nz, center = FALSE, scale. = FALSE)
-scores  <- data.frame(
-  PC1     = pca_res$x[,1],
-  PC2     = pca_res$x[,2],
+scores <- data.frame(
+  PC1 = pca_res$x[,1],
+  PC2 = pca_res$x[,2],
   cluster = factor(km$cluster)
 )
 
-# Plot
+# Plot the results
 library(ggplot2)
 ggplot(scores, aes(x = PC1, y = PC2, color = cluster)) +
   geom_point(alpha = 0.7, size = 2) +
   labs(
-    title = paste0("PCA of Videos Colored by K‑means Cluster (k=", k, ")"),
+    title = paste0("PCA of Videos Colored by K-means Cluster (k=", k, ")"),
     x = "PC1", y = "PC2", color = "Cluster"
   ) +
   theme_minimal()
@@ -184,17 +187,31 @@ head(arrange(loadings, PC1), 10)
 ```{r}
 library(dplyr)
 library(tidyr)
+# 1. Ensure no NAs in the 'tags' column of df
+df_clean <- df %>%
+  filter(!is.na(tags) & tags != "")  # Remove rows with NAs or empty tags
 
-# --- after you build `docs` and `dtm_tfidf` and do:
+# Build a DTM with TF-IDF for all videos
+docs <- df_clean %>%
+  transmute(
+    doc_id,
+    text = map_chr(tags, paste, collapse = " ")
+  )
+
+# Create the DTM
+dtm <- docs %>%
+  unnest_tokens(term, text) %>%
+  count(doc_id, term, sort = FALSE) %>%
+  cast_dtm(doc_id, term, n)
+
+# Apply TF-IDF
+dtm_tfidf <- weightTfIdf(dtm)
 m <- as.matrix(dtm_tfidf)
 
-# 1. Get the doc_ids that appear as rows in m
-valid_doc_ids <- as.integer(rownames(m))
-
-# 2. (Optional) further drop any all-zero rows, if you did L2-normalize
-non_zero_mask   <- rowSums(m) > 0
-valid_doc_ids   <- valid_doc_ids[non_zero_mask]
-m_nz            <- m[non_zero_mask, , drop = FALSE]
+# 2. Remove any all-zero rows (this ensures no empty documents)
+non_zero_mask <- rowSums(m) > 0
+m_nz <- m[non_zero_mask, , drop = FALSE]
+valid_doc_ids <- as.integer(rownames(m_nz))
 
 # 3. Run k-means on the filtered matrix
 k <- min(5, nrow(m_nz) - 1)
@@ -203,12 +220,12 @@ km <- kmeans(m_nz, centers = k, nstart = 25)
 
 # 4. Build a map of doc_id → cluster
 cluster_map <- tibble(
-  doc_id  = valid_doc_ids,
+  doc_id = valid_doc_ids,
   cluster = factor(km$cluster)
 )
 
-# 5. Subset your original df by those doc_ids and join
-df_nz <- df %>%
+# 5. Subset the original df by valid doc_ids (those that are not empty or NA)
+df_nz <- df_clean %>%
   filter(doc_id %in% valid_doc_ids) %>%
   left_join(cluster_map, by = "doc_id")
 
@@ -230,55 +247,53 @@ print(top_tags_per_cluster)
 
 ------------------------------------------------------------------------
 
-## Cluster 1: **#vent — Emotional Expression & Personal Struggles**
+## Cluster 1: #personal_reflection — Nostalgia and Identity Exploration
 
-**Top hashtags:**\
-`#vent`, `#fyp`, `#ed`, `#21`, `#airportcrush`
+**Top hashtags:** #greenscreenvideo (4), #onthisday (3), #collegelife (2)
 
 **Description:**\
-This cluster likely represents users sharing **personal stories**, emotional vulnerability, and possibly early-stage recovery narratives. Tags like `#vent` and `#ed` hint at **open emotional release**, while `#airportcrush` and `#21` add a sense of youth and personal anecdotes.
+
+This cluster reflects content centered around personal reflection, nostalgic moments, and identity exploration. Hashtags like #greenscreenvideo indicate the use of multimedia tools, possibly adding a creative layer to personal storytelling. The presence of #onthisday points to a focus on remembering significant past events, and #collegelife suggests a connection to youthful or academic experiences, indicating that users in this cluster may be revisiting or reflecting on their journey, particularly during the college years.
 
 ------------------------------------------------------------------------
 
-## Cluster 2: **#real — Authenticity and Anti-Perfection**
+### Cluster 2: #mental_health_struggles — Mental Health & Recovery Challenges
 
-**Top hashtags:**\
-`#real`
+**Top hashtags:** #recovery (94), #edrecovery (91), #edrecovry (79), #anarecoveryy (70), #anarecovery (59)
 
 **Description:**\
-A minimal cluster dominated by `#real`. Suggests content focused on **authenticity**, **anti-glamour**, and **unfiltered mental health journeys**. Likely creators rejecting the curated nature of TikTok in favor of “what it’s really like.”
+
+This cluster captures themes of mental health recovery, with a particular focus on eating disorders. The hashtags #edrecovery, #edrecovry, #anarecoveryy, and #anarecovery emphasize struggles and recovery from eating disorders, while #recovery and #edrecovery are commonly used in broader mental health discussions. The recurrence of similar recovery-focused hashtags suggests that this cluster is dedicated to sharing personal recovery narratives, supporting those on similar journeys, and fostering a sense of community and solidarity.
 
 ------------------------------------------------------------------------
 
-## Cluster 3: **#london — Aesthetic & Cultural Identity**
+### Cluster 3: #authenticity_and_vulnerability — Raw and Unfiltered Recovery Stories
 
-**Top hashtags:**\
-`#london`, `#clairo`, `#fionaapple`, `#kingsroad`, `#model`
+**Top hashtags:** #real (28), #exerciseaddictionrecovery (8)
 
 **Description:**\
-This cluster reflects a niche aesthetic — **urban, alternative, or indie-inspired recovery content**. The inclusion of artists like `#clairo` and `#fionaapple` plus location tags points to **cultural and aesthetic framing** of mental health and identity.
+
+This cluster emphasizes authenticity and vulnerability in the context of mental health and recovery. The dominant hashtag, #real, reflects content that likely focuses on raw, unfiltered personal experiences. It’s a space for those who reject the polished or curated side of social media, sharing what recovery really looks like. The addition of #exerciseaddictionrecovery points to a specific form of recovery, indicating that users in this cluster may also be grappling with addiction and the journey to overcome it.
 
 ------------------------------------------------------------------------
 
-## Cluster 4: **#fyp — Mainstream Recovery & Mental Health**
+### Cluster 4: #style_and_self_image — Appearance and Personal Expression
 
-**Top hashtags:**\
-`#fyp`, `#recovery`, `#mentalhealth`, `#edrecovery`, `#ed`
+**Top hashtags:** #ootd (10), #fitcheck (2), #gifted (1)
 
 **Description:**\
-The largest and most central cluster. Contains **general, highly visible** recovery content aimed at wide audiences. Likely to show up on TikTok’s **For You Page**. Themes include awareness, solidarity, and mainstream mental health narratives.
+
+This cluster blends elements of personal expression and self-image with the theme of recovery. The hashtag #ootd (outfit of the day) is a common marker for showcasing personal style, while #fitcheck suggests a focus on physical appearance, likely tying into body image and self-confidence issues. The inclusion of #gifted may indicate a connection to personal growth or empowerment, possibly in the context of recognizing strengths during recovery or self-reflection.
 
 ------------------------------------------------------------------------
 
-## Cluster 5: **#collegelife — Student & Nostalgia Niche**
+### Cluster 5: #mainstream_recovery_and_awareness — Broad Mental Health Advocacy
 
-**Top hashtags:**\
-`#onthisday`, `#collegelife`
+**Top hashtags:** #fyp (831), #edrecovery (542), #mentalhealth (444), #recoveryispossible (438), #mentalhealthmatters (395)
 
 **Description:**\
-Small cluster possibly focused on **academic life** and **personal reflection**. May include recovery stories related to school stress or identity during college years, or throwback-style memory sharing.
 
-# Evaluation
+The largest cluster, this one represents a broad and mainstream approach to recovery and mental health advocacy. The prominence of the #fyp hashtag indicates that this content is aimed at reaching a wide audience on TikTok, likely showing up on users' For You Pages. Hashtags like #mentalhealth, #recoveryispossible, and #mentalhealthmatters suggest a focus on awareness, hope, and support, making this cluster central to the broader conversation around mental health recovery and solidarity. This cluster is likely filled with educational content, inspirational messages, and general recovery-related discussions aimed at a wide and diverse audience.
 
 ```{r}
 # Compute Purity and Entropy per cluster
@@ -308,12 +323,28 @@ cluster_eval
 
 ```
 
-Cluster 2 shows perfect purity (**100%**) and zero entropy, meaning that **every single post** in that cluster prominently featured the hashtag **#real**. This indicates that K-means clustering captured a very tight and coherent group of posts all centered around authenticity and unfiltered mental health narratives, as expected.
+### Cluster 1:
 
-Cluster 5, centered around **#collegelife**, also shows a high purity of **60%** and a low entropy of **0.97**, suggesting that the majority of posts within this group relate to the college life experience and reflections tied to mental health and eating disorder recovery. This cluster is relatively homogeneous, meaning users in this group consistently reference the same theme.
+Cluster 1, centered around #collegelife, shows a moderate purity of 44.44% and an entropy of 1.53. This suggests that the majority of posts in this cluster are centered on the theme of college life, but there is still some diversity in the content, reflecting a range of personal experiences related to mental health and recovery during the college years. It is not a perfectly homogeneous group but has a clear focus on the college experience.
 
-Cluster 3, with the top tag **#clairo** (an indie artist), has a moderate purity of **46%** and an entropy of **2.51**. This shows that although #clairo is the most common tag, there is still **moderate diversity** in hashtags within this group. Likely, posts here blend aesthetic or musical references with recovery narratives, but also touch on broader topics.
+### Cluster 2:
 
-Cluster 1, with the top tag **#21**, has relatively **low purity (18%)** and a **high entropy (5.17)**. This indicates that the cluster is **heterogeneous** — there is no strong single theme dominating. Posts here might be more personal and varied, sharing a wide range of recovery experiences, life events, or even random content alongside recovery hashtags.
+Cluster 2, with the top hashtags #1, shows low purity (9.09%) and very high entropy (5.56 / 8.73). This indicates that the cluster is highly mixed, with no strong single theme dominating. Posts here likely feature a range of content, from personal achievements to varied recovery narratives, making this cluster noisy and difficult to classify into one clear theme. The repetition of the hashtag #1 suggests a possible focus on individual milestones or recognition, but the diversity of topics makes it more scattered.
 
-Cluster 4 stands out: although **#1** is the top tag, it represents only **5%** of the posts, and the entropy is extremely high (**8.59**). This suggests that Cluster 4 is **very mixed and noisy** — it does not represent a clean, single-topic group. It might include miscellaneous or hard-to-classify posts where hashtags are highly varied, and no strong common theme exists.
+### Cluster 3:
+
+Cluster 3, centered around #exerciseaddictionrecovery, has a high purity of 77.78% and low entropy of 0.76. This indicates a very coherent and focused group of posts primarily centered around recovery from exercise addiction. Most posts in this cluster prominently feature #exerciseaddictionrecovery, and the content remains tightly related to this theme, making it one of the more focused and consistent clusters.
+
+### Cluster 4:
+
+Cluster 4, with the top hashtag #fitcheck, shows a high purity of 76.92% and a low entropy of 0.99. This indicates that the majority of posts in this cluster are centered around the theme of fashion and self-expression, particularly through outfit sharing (#fitcheck). The content here is highly focused on personal style and self-image, and likely intersects with recovery themes, showing a consistent focus on fashion as a form of self-empowerment.
+
+### Summary:
+
+-   **Cluster 1** has a moderate focus on college life and related mental health experiences, though there is some diversity in the content.
+
+-   **Cluster 2** is highly mixed and noisy, with no clear dominant theme, despite a focus on individual milestones or recognition.
+
+-   **Cluster 3** is tightly focused on exercise addiction recovery, with a high degree of consistency within the posts.
+
+-   **Cluster 4** is centered on fashion and self-expression, with a consistent theme of personal style and self-image in recovery.
