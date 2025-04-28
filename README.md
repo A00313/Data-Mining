@@ -10,10 +10,15 @@ This repository contains all materials for our project, including the final pres
 
 ## Contents
 [Final Project Slides (PDF)](DM%20Spring%2025%20Group%203.pdf)
+
 [Final Project Paper (PDF)]
+
 [Source Code](https://github.com/A00313/Data-Mining)
+
 [Search Dataset](search_result_edrec0very.csv)
+
 [Profile Dataset](scrape_profiles/tiktok_hashtags.csv)
+
 [Clean Dataset](clean_dataset/tiktok_hashtags.csv)
 
 
